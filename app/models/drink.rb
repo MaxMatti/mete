@@ -20,7 +20,7 @@ class Drink < ApplicationRecord
   private
 
   def set_defaults
-    self.price = 1.5
+    #self.price = 1.5
   end
 
   def normalize_filename

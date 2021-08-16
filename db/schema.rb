@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 2017_09_29_201659) do
     t.datetime "updated_at"
     t.decimal "balance", precision: 20, scale: 2, default: "0.0"
     t.boolean "active", default: true
-    t.boolean "audit", default: false
+    t.boolean "audit", default: true
     t.boolean "redirect", default: true
   end
 

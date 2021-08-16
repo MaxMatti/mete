@@ -75,7 +75,6 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @user.deposit(BigDecimal(params[:amount]))
     flash[:success] = "You just deposited some money and your new balance is #{show_amount(@user.balance)}. Thank you."
-    warn_user_if_audit
     no_resp_redir @user
   end
 
@@ -103,10 +102,6 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @user.payment(BigDecimal(params[:amount]))
     flash[:success] = "You just bought a drink and your new balance is #{show_amount(@user.balance)}. Thank you."
-    if (@user.balance < 0) then
-      flash[:warning] = "Your balance is below zero. Remember to compensate as soon as possible."
-    end
-    warn_user_if_audit
     no_resp_redir @user
   end
 
@@ -122,20 +117,10 @@ class UsersController < ApplicationController
   def buy_drink
     @user.buy(@drink)
     flash[:success] = "You just bought a drink and your new balance is #{show_amount(@user.balance)}. Thank you."
-    if (@user.balance < 0) then
-      flash[:warning] = "Your balance is below zero. Remember to compensate as soon as possible."
-    end
-    warn_user_if_audit
     no_resp_redir @user.redirect ? redirect_path(@user) : @user
   end
 
   def user_params
     params.require(:user).permit(:name, :email, :balance, :active, :audit, :redirect)
-  end
-
-  def warn_user_if_audit
-    if (@user.audit) then
-      flash[:info] = "This transaction has been logged, because you set up your account that way. #{view_context.link_to 'Change?', edit_user_url(@user)}".html_safe
-    end
   end
 end

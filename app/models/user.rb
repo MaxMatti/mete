@@ -2,6 +2,7 @@
 
 class User < ApplicationRecord
   validates :name, presence: true
+  after_initialize :set_defaults
 
   scope :order_by_name_asc, -> {
     order(arel_table['name'].lower.asc)
@@ -9,6 +10,10 @@ class User < ApplicationRecord
 
   after_save do |user|
     Audit.create! difference: user.balance - user.balance_before_last_save, drink: @purchased_drink.nil? ? 0 : @purchased_drink.id, user: user.audit? ? user.id : nil
+  end
+
+  def set_defaults
+    self.audit = true
   end
 
   def deposit(amount)
