@@ -1,12 +1,13 @@
 version: "3"
 
 networks:
-  appservers:
+  metenetwork:
 
 volumes:
   system:
   backup:
   database:
+  pgadmin:
 
 services:
   db:
@@ -16,9 +17,26 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
     networks:
-      appservers:
+      metenetwork:
         aliases:
           - db
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'max.staff@gmx.de'
+      PGADMIN_DEFAULT_PASSWORD: 'affenstark'
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/root/.pgadmin
+    restart: on-failure
+    ports:
+      - "82:80"
+    networks:
+      metenetwork:
+    depends_on:
+      - db
 
   db-backup:
     image: nomaster/postgres-backup
@@ -28,7 +46,7 @@ services:
       - backup:/backup
     restart: on-failure
     networks:
-      appservers:
+      metenetwork:
     depends_on:
       - db
 
@@ -45,8 +63,10 @@ services:
       - system:/app/public/system
     restart: on-failure
     networks:
-      appservers:
+      metenetwork:
         aliases:
           - app
     depends_on:
       - db
+    ports:
+      - "81:80"
