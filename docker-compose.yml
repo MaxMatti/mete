@@ -1,7 +1,7 @@
 version: "3"
 
 networks:
-  metenetwork:
+  appservers:
 
 volumes:
   system:
@@ -17,7 +17,7 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
     networks:
-      metenetwork:
+      appservers:
         aliases:
           - db
 
@@ -25,18 +25,16 @@ services:
     container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: 'max.staff@gmx.de'
-      PGADMIN_DEFAULT_PASSWORD: 'affenstark'
+      PGADMIN_DEFAULT_EMAIL: max.staff@gmx.de
+      PGADMIN_DEFAULT_PASSWORD: affenstark
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
        - pgadmin:/root/.pgadmin
     restart: on-failure
-    ports:
-      - "82:80"
-    networks:
-      metenetwork:
     depends_on:
       - db
+    ports:
+      - "82:80"
 
   db-backup:
     image: nomaster/postgres-backup
@@ -46,7 +44,7 @@ services:
       - backup:/backup
     restart: on-failure
     networks:
-      metenetwork:
+      appservers:
     depends_on:
       - db
 
@@ -54,16 +52,12 @@ services:
     environment:
       RAILS_ENV: production
       SENTRY_DSN:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: chaosdorf/mete
-    build: .
+    image: maxmatti/mete
     volumes:
       - system:/app/public/system
     restart: on-failure
     networks:
-      metenetwork:
+      appservers:
         aliases:
           - app
     depends_on:
