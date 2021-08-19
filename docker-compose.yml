@@ -22,7 +22,6 @@ services:
           - db
 
   pgadmin:
-    container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: max.staff@gmx.de
@@ -31,6 +30,10 @@ services:
     volumes:
        - pgadmin:/root/.pgadmin
     restart: on-failure
+    networks:
+      appservers:
+        aliases:
+          - pgadmin
     depends_on:
       - db
     ports:
